@@ -8,9 +8,7 @@ import { checkSessionIdExists } from '../middlewares/check-sessionId-exist.js'
 export async function mealsRoutes (app :FastifyInstance) {
 
     //register meal
-    app.post('/register', {
-        preHandler: [checkSessionIdExists]
-    } ,async (request, reply) => {
+    app.post('/register', { preHandler: [checkSessionIdExists] } ,async (request, reply) => {
         
         try {
             //defined types
@@ -40,6 +38,77 @@ export async function mealsRoutes (app :FastifyInstance) {
         catch (error) {
             console.error(error)
             return reply.status(400).send(JSON.stringify({message: 'error registering meal'}))
+        }
+    })
+
+    //listing meals
+    app.get('/list', { preHandler: [checkSessionIdExists] } ,async (request, reply) => {
+        try {
+            
+            const userId = request.cookies.sessionId
+
+            const mealsList = await db('meal').where('userId', userId).select('*')    
+            return reply.status(201).send({meals: mealsList})
+        } 
+        catch (error) {
+            console.error(error)
+            return reply.status(201).send(JSON.stringify( {message: 'error when listing meals' }))
+
+        }
+    })
+
+    //list specific meal
+    app.get('/list/:id', { preHandler: [checkSessionIdExists] } ,async (request, reply) => {
+        try {
+
+            const getMealsPamansSchema = z.object({
+                id: z.uuid(),
+            })
+
+            const { id } = getMealsPamansSchema.parse(request.params)
+            const userId = request.cookies.sessionId
+
+            const mealsList = await db('meal').where({id: id, userId: userId}).first()
+            return reply.status(201).send({meals: mealsList})
+        } 
+        catch (error) {
+            console.error(error)
+            return reply.status(201).send(JSON.stringify( {message: 'error when listing specific meal' }))
+
+        }
+    })
+
+    //edit specific meal
+    app.put('/edit', async (request, reply) => {
+        try {
+            //defined types
+            const createMealsBodySchema = z.object({
+                name: z.string(),
+                description: z.string(),
+                diet: z.enum(['onDiet', 'noDiet']),
+            })
+
+            const getMealsPamansSchema = z.object({
+                id: z.uuid(),
+            })
+    
+            const { name, description, diet} = createMealsBodySchema.parse(request.body)
+            const { id } = getMealsPamansSchema.parse(request.params)
+
+            const userId = request.cookies.sessionId;
+    
+            await db('meal').where({id: id, userId: userId}).update({
+                name, 
+                description,
+                diet
+            })
+            
+            return reply.status(201).send(JSON.stringify({message: 'meal edited successful'}))
+
+        } 
+        catch (error) {
+            console.error(error)
+            return reply.status(400).send(JSON.stringify({message: 'error when editig meal'}))
         }
     })
 }

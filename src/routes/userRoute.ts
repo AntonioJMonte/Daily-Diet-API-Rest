@@ -44,8 +44,8 @@ export async function userRoutes(app: FastifyInstance) {
         try {
             //defined types
             const createUsersBodySchema = z.object({
-            email: z.email(),
-            password: z.string(),
+                email: z.email(),
+                password: z.string(),
             })
 
             const { email, password } = createUsersBodySchema.parse(request.body)
@@ -63,6 +63,9 @@ export async function userRoutes(app: FastifyInstance) {
 
             //creating session id
             reply.setCookie('sessionId', user.id, {
+                secure: false,          // ok para localhost
+                httpOnly: true,         // ESSENCIAL
+                sameSite: 'lax',
                 path: '/', //availabre on all routes
                 maxAge: 60 * 60 * 24 *7, // 7 days
             })
@@ -77,11 +80,11 @@ export async function userRoutes(app: FastifyInstance) {
     })
 
 
-    // app.get('/listUsers', async (request, reply) => {
+    app.get('/listUsers', async (request, reply) => {
 
-    //     const allUsers = await db('users').select('*')
-    //     return reply.status(201).send({users: allUsers})
-    // })
+        const allUsers = await db('users').select('*')
+        return reply.status(201).send({users: allUsers})
+    })
 
     // app.delete('/delete', async (request, reply) => {
     //     await db('users').delete('*')

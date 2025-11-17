@@ -9,8 +9,9 @@ export async function up(knex: Knex): Promise<void> {
         table.string('description').notNullable()
         table.date('date').defaultTo(knex.fn.now()).notNullable()
         table.time('hour').defaultTo(knex.fn.now()).notNullable()
+        table.string('edited')
         table.string('diet').notNullable()
-        table.uuid('user_id').references('id').inTable('users')
+        table.uuid('userId').references('id').inTable('users')
     })
 
 }

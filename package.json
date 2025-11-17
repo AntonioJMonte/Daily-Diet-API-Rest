@@ -1,0 +1,31 @@
+{
+  "name": "atividade-pratica",
+  "version": "1.0.0",
+  "description": "- [] Deve ser possível criar um usuário\r - [] Deve ser possível identificar o usuário entre as requisições\r - [] Deve ser possível registrar uma refeição feita, com as seguintes informações:\r     - [] Nome\r     - [] Descrição\r     - [] Data e hora\r     - [] Está dentro da dieta ou não\r - [] Deve ser possível editar uma refeição, podendo alterar todos os dados acima\r - [] Deve ser possível listar todas as refeições de um usuário\r - [] Deve ser possível visualizar uma única refeição\r - [] Deve ser possível recuperar as métricas de um usuário\r     - [] Quantidade total de refeições registradas\r     - [] Quantidade total de refeições dentro da dieta\r     - [] Quantidade total de refeições fora da dieta\r     - [] Melhor sequência de refeições dentro da dieta\r - [] O usuário só pode visualizar, editar e apagar as refeições o qual ele criou",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "knex": "tsx ./node_modules/knex/bin/cli.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.0.2",
+    "@types/bcrypt": "^6.0.0",
+    "bcrypt": "^6.0.0",
+    "crypt": "^0.0.2",
+    "dotenv": "^17.2.3",
+    "fastify": "^5.6.2",
+    "knex": "^3.1.0",
+    "sqlite3": "^5.1.7",
+    "uuid": "^13.0.0",
+    "zod": "^4.1.12"
+  }
+}

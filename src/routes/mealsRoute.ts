@@ -48,7 +48,7 @@ export async function mealsRoutes (app :FastifyInstance) {
             const userId = request.cookies.sessionId
 
             const mealsList = await db('meal').where('userId', userId).select('*')    
-            return reply.status(201).send({meals: mealsList})
+            return reply.status(201).send({mealsList})
         } 
         catch (error) {
             console.error(error)
@@ -69,7 +69,7 @@ export async function mealsRoutes (app :FastifyInstance) {
             const userId = request.cookies.sessionId
 
             const mealsList = await db('meal').where({id: id, userId: userId}).first()
-            return reply.status(201).send({meals: mealsList})
+            return reply.status(201).send({mealsList})
         } 
         catch (error) {
             console.error(error)
@@ -79,7 +79,7 @@ export async function mealsRoutes (app :FastifyInstance) {
     })
 
     //edit specific meal
-    app.put('/edit', async (request, reply) => {
+    app.put('/edit/:id', { preHandler: [checkSessionIdExists] } ,async (request, reply) => {
         try {
             //defined types
             const createMealsBodySchema = z.object({
@@ -97,11 +97,14 @@ export async function mealsRoutes (app :FastifyInstance) {
 
             const userId = request.cookies.sessionId;
     
-            await db('meal').where({id: id, userId: userId}).update({
+            const mealUpdated = await db('meal').where({id: id, userId: userId}).update({
                 name, 
                 description,
-                diet
+                diet,
+                updated_at: new Date().toISOString(),
             })
+
+            if(!mealUpdated) return reply.status(404).send(JSON.stringify({message: 'meal not found'}))
             
             return reply.status(201).send(JSON.stringify({message: 'meal edited successful'}))
 
@@ -109,6 +112,54 @@ export async function mealsRoutes (app :FastifyInstance) {
         catch (error) {
             console.error(error)
             return reply.status(400).send(JSON.stringify({message: 'error when editig meal'}))
+        }
+    })
+
+    //fetching metrics 
+    app.get('/metrics', { preHandler: [checkSessionIdExists] }, async (request, reply) => {
+        try {
+            const userId = request.cookies.sessionId
+
+            const meals = await db('meal')
+                .where('userId', userId)
+                .orderBy('date', 'asc') 
+                .orderBy('hour', 'asc')
+                .select()
+
+            const totalMeals = meals.length
+            
+            const totalMealsOnDiet = meals.filter(meal => meal.diet === 'onDiet').length
+            
+            const totalMealsOffDiet = totalMeals - totalMealsOnDiet
+
+            let bestSequence = 0
+            let currentSequence = 0
+
+            for (const meal of meals) {
+                if (meal.diet === 'onDiet') {
+                    currentSequence += 1
+                } else {
+                    if (currentSequence > bestSequence) {
+                        bestSequence = currentSequence
+                    }
+                    currentSequence = 0
+                }
+            }
+
+            if (currentSequence > bestSequence) {
+                bestSequence = currentSequence
+            }
+
+            return reply.status(200).send({
+                totalMeals,
+                totalMealsOnDiet,
+                totalMealsOffDiet,
+                bestSequence
+            })
+
+        } catch (error) {
+            console.error(error)
+            return reply.status(500).send({ message: 'Erro when fetching metrics' })
         }
     })
 }

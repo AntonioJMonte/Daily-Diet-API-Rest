@@ -3,6 +3,7 @@ import { db } from '../database.js'
 import { z } from 'zod'
 import crypto, { randomUUID } from 'node:crypto'
 import bcrypt from 'bcrypt'
+import { request } from 'node:http'
 
 //salts
 const saltsRound  = 10
@@ -85,6 +86,7 @@ export async function userRoutes(app: FastifyInstance) {
         const allUsers = await db('users').select('*')
         return reply.status(201).send({users: allUsers})
     })
+
 
     // app.delete('/delete', async (request, reply) => {
     //     await db('users').delete('*')

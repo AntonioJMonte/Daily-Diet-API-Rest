@@ -1,9 +1,9 @@
-import knex from "knex"
-import { app } from "./app.js"
+    import { app } from "./app.js"
+import { env } from "./env/index.js"
 
 
 app.listen({
-    port: 3333
+    port: env.PORT
 }).then(() => {
     console.log("HTTP server running")
 })

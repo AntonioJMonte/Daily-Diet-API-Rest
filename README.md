@@ -1,4 +1,4 @@
-# 📦 Desafio 02 — API RESTful com Node.js  
+# 📦 API RESTful com Node.js  
 Projeto desenvolvido como parte do módulo **“Criando APIs RESTful com Node.js”**, onde o objetivo é construir uma API completa utilizando conceitos fundamentais do Node.js, boas práticas e ferramentas do ecossistema JavaScript.
 
 ---
